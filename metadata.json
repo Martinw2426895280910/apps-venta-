@@ -1,0 +1,6 @@
+{
+  "name": "Guía Conquista 50+",
+  "description": "Guía personalizada y test interactivo para conquistar a una mujer de 50 años con respeto, presencia y autenticidad.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
