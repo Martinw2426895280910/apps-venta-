@@ -119,19 +119,34 @@ export const UnlockModal: React.FC<UnlockModalProps> = ({
           </button>
         </form>
 
-        <div className="mt-5 pt-4 border-t border-[#E8DEC9] text-center">
-          <p className="text-xs text-[#7A626B] mb-2.5">
-            ¿Aún no tienes tu código o no has pagado los {CONFIG.price}?
+        <div className="mt-5 pt-4 border-t border-[#E8DEC9] space-y-2.5 text-center">
+          <p className="text-xs text-[#7A626B]">
+            ¿Aún no has adquirido tu acceso ({CONFIG.price})?
           </p>
+
+          <a
+            id="modal-paypal-buy-btn"
+            href={CONFIG.paymentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="animate-paypal-pulse flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277]"
+          >
+            <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
+              <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
+            </svg>
+            <span>Pagar {CONFIG.price} con PayPal</span>
+          </a>
+
           <a
             id="modal-whatsapp-contact-btn"
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#128C7E] font-semibold text-xs transition-colors border border-[#25D366]/30"
+            className="inline-flex items-center justify-center gap-2 w-full py-2 px-3 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 text-[#128C7E] font-semibold text-xs transition-colors border border-[#25D366]/30"
           >
-            <MessageCircle className="w-4 h-4 text-[#25D366]" />
-            <span>Solicitar código con el creador por WhatsApp</span>
+            <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+            <span>O acordar por WhatsApp con el autor</span>
           </a>
         </div>
       </div>

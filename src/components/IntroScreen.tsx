@@ -299,22 +299,39 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
       </section>
 
       {/* Bottom CTA Card */}
-      <section className="bg-gradient-to-r from-[#FAF0E1] to-[#FFF9F0] border border-[#E2D3BA] rounded-3xl p-6 sm:p-8 text-center space-y-4">
+      <section className="bg-gradient-to-r from-[#FAF0E1] to-[#FFF9F0] border border-[#E2D3BA] rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-xs">
         <h2 className="font-display font-bold text-2xl sm:text-3xl text-[#3D0F20]">
           ¿Listo para evaluar tu perfil de conquista?
         </h2>
         <p className="text-sm text-[#665058] max-w-md mx-auto">
           Responde con honestidad las 10 preguntas. Conocerás tu puntuación exacta de 0 a 100 y recibirás tus 3 mejores consejos gratuitos.
         </p>
-        <div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
           <button
             id="bottom-start-quiz-btn"
             onClick={onStartQuiz}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#6D1A36] hover:bg-[#852143] text-white font-bold text-base shadow-md active:scale-98 transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-8 py-4 rounded-full bg-[#6D1A36] hover:bg-[#852143] text-white font-bold text-base shadow-md active:scale-98 transition-all cursor-pointer"
           >
             <span>Iniciar Test Gratuito Ahora</span>
             <ArrowRight className="w-4 h-4" />
           </button>
+
+          {!unlocked && (
+            <a
+              id="intro-bottom-paypal-btn"
+              href={CONFIG.paymentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="animate-paypal-pulse inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-full bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277]"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
+                <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
+              </svg>
+              <span>Comprar Guía con PayPal ({CONFIG.price})</span>
+            </a>
+          )}
         </div>
       </section>
     </div>

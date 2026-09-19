@@ -2,7 +2,7 @@ import { CategoryKey, Question, DateIdea, MessageGroup, PlanDay, AppConfig } fro
 
 export const CONFIG: AppConfig = {
   price: "$7 USD",
-  paymentUrl: "",
+  paymentUrl: "https://www.paypal.com/ncp/payment/PLB-VVEFXQETRP2W",
   whatsapp: "543772636749",
   codes: ["CONQUISTA50", "VIP50", "AMOR50"]
 };

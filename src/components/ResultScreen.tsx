@@ -11,7 +11,9 @@ import {
   AlertCircle, 
   Lightbulb,
   HeartHandshake,
-  Home
+  Home,
+  ShieldCheck,
+  CreditCard
 } from 'lucide-react';
 import { CONFIG, CATS, CAT_ICON, TIP } from '../data';
 import { DiagnosisScore, CategoryKey } from '../types';
@@ -326,26 +328,65 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
             </div>
           </div>
 
-          {/* Price and WhatsApp Purchase Button */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/15">
-            <div>
-              <div className="flex items-baseline gap-2">
-                <span className="font-display font-bold text-4xl text-[#ECC978]">{CONFIG.price}</span>
-                <span className="text-xs text-[#F0E5D0]/80">Pago único</span>
+          {/* Price & Primary Payment: PAYPAL BUTTON (BIG & PULSATING) */}
+          <div className="pt-3 space-y-4 border-t border-white/15">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+              <div>
+                <div className="flex items-baseline justify-center sm:justify-start gap-2">
+                  <span className="font-display font-bold text-4xl sm:text-5xl text-[#ECC978]">{CONFIG.price}</span>
+                  <span className="text-xs text-[#F0E5D0]/80 font-medium">Pago único</span>
+                </div>
+                <p className="text-xs text-[#ECC978]">Acceso completo e ilimitado de por vida</p>
               </div>
-              <span className="text-[11px] text-[#ECC978]">Acceso de por vida en este dispositivo</span>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 text-xs text-[#F4EBE0] border border-white/15">
+                <ShieldCheck className="w-4 h-4 text-[#ECC978] shrink-0" />
+                <span>Pago seguro garantizado</span>
+              </div>
             </div>
 
-            <a
-              id="result-buy-whatsapp-btn"
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-sm shadow-md active:scale-98 transition-all"
-            >
-              <MessageCircle className="w-4 h-4 fill-current" />
-              <span>Pagar por WhatsApp ({CONFIG.price})</span>
-            </a>
+            {/* BIG PULSATING PAYPAL BUTTON */}
+            <div className="relative pt-1">
+              <a
+                id="paypal-primary-buy-btn"
+                href={CONFIG.paymentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="animate-paypal-pulse relative flex flex-col items-center justify-center w-full py-4 sm:py-5 px-6 sm:px-8 rounded-2xl bg-gradient-to-r from-[#FFC439] via-[#FFB700] to-[#E5A800] hover:from-[#FFD05E] hover:to-[#FFB700] text-[#002C6C] font-black text-lg sm:text-xl shadow-2xl active:scale-[0.98] transition-all cursor-pointer border-2 border-[#FFE885] no-underline"
+              >
+                <div className="flex items-center justify-center gap-2.5 sm:gap-3">
+                  {/* Official PayPal Monogram SVG */}
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" viewBox="0 0 24 24" fill="none">
+                    <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
+                    <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
+                  </svg>
+                  <span className="tracking-tight uppercase">PAGAR CON PAYPAL ({CONFIG.price})</span>
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#002C6C] shrink-0" />
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-[#003087]/85 tracking-normal mt-1">
+                  Tarjeta de Crédito, Débito o Saldo PayPal • Desbloqueo Inmediato
+                </span>
+              </a>
+            </div>
+
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-center space-y-1">
+              <p className="text-[11px] sm:text-xs text-[#ECC978]">
+                ⚡ <strong>Entrega automática:</strong> Tras completar tu pago seguro en PayPal recibirás tu código de acceso para ingresarlo aquí abajo y desbloquear tu guía al instante.
+              </p>
+            </div>
+
+            {/* Alternative payment method via WhatsApp */}
+            <div className="flex items-center justify-center pt-1">
+              <a
+                id="result-buy-whatsapp-btn"
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-[#25D366] hover:text-[#42f085] text-xs sm:text-sm font-semibold border border-[#25D366]/40 transition-colors"
+              >
+                <MessageCircle className="w-4 h-4 fill-current" />
+                <span>¿Prefieres transferir o acordar por WhatsApp? Haz clic aquí</span>
+              </a>
+            </div>
           </div>
 
           {/* Access Code Input Box */}
