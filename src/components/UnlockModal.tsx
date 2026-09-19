@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, KeyRound, CheckCircle2, MessageCircle, AlertCircle } from 'lucide-react';
 import { CONFIG } from '../data';
+import { openPayPalCheckout } from '../utils/payment';
 
 interface UnlockModalProps {
   isOpen: boolean;
@@ -129,7 +130,8 @@ export const UnlockModal: React.FC<UnlockModalProps> = ({
             href={CONFIG.paymentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="animate-paypal-pulse flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277]"
+            onClick={openPayPalCheckout}
+            className="animate-paypal-pulse flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277] cursor-pointer"
           >
             <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />

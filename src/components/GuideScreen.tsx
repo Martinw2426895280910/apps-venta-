@@ -33,6 +33,7 @@ import {
   CONFIG 
 } from '../data';
 import { DiagnosisScore, CategoryKey, DateIdea } from '../types';
+import { openPayPalCheckout } from '../utils/payment';
 
 interface GuideScreenProps {
   scoreData: DiagnosisScore;
@@ -177,6 +178,18 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
                 <span>Inicio</span>
               </button>
             )}
+
+            <a
+              id="guide-paypal-direct-btn"
+              href={CONFIG.paymentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={openPayPalCheckout}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-[#FFC439] hover:bg-[#FFB700] text-xs sm:text-sm font-black text-[#002C6C] border border-[#FFE277] shadow-sm transition-all cursor-pointer"
+              title="Enlace de Pago PayPal"
+            >
+              <span>PayPal {CONFIG.price}</span>
+            </a>
 
             <button
               id="guide-back-to-result-btn"

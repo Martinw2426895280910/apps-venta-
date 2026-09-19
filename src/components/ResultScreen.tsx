@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { CONFIG, CATS, CAT_ICON, TIP } from '../data';
 import { DiagnosisScore, CategoryKey } from '../types';
+import { openPayPalCheckout } from '../utils/payment';
 
 interface ResultScreenProps {
   scoreData: DiagnosisScore;
@@ -261,14 +262,26 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
           <p className="text-sm text-[#665058] max-w-md mx-auto">
             Ya tienes acceso completo al plan de 7 días, ideas de citas con fotos, los 15 mensajes y el checklist de 90 días.
           </p>
-          <button
-            id="result-open-guide-btn"
-            onClick={onOpenGuide}
-            className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#6D1A36] hover:bg-[#852143] text-white font-bold text-base shadow-md active:scale-98 transition-all cursor-pointer"
-          >
-            <span>Abrir Mi Guía Personalizada</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              id="result-open-guide-btn"
+              onClick={onOpenGuide}
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-[#6D1A36] hover:bg-[#852143] text-white font-bold text-base shadow-md active:scale-98 transition-all cursor-pointer"
+            >
+              <span>Abrir Mi Guía Personalizada</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <a
+              id="result-unlocked-paypal-btn"
+              href={CONFIG.paymentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={openPayPalCheckout}
+              className="inline-flex items-center justify-center gap-1.5 px-5 py-3 rounded-full bg-[#FFC439] hover:bg-[#FFB700] text-[#002C6C] font-extrabold text-xs sm:text-sm border border-[#FFE277] shadow-sm transition-all cursor-pointer"
+            >
+              <span>Enlace de Pago PayPal ({CONFIG.price})</span>
+            </a>
+          </div>
         </section>
       ) : (
         <section className="bg-gradient-to-br from-[#3D0F20] via-[#5C152E] to-[#200711] text-white rounded-3xl p-6 sm:p-8 shadow-xl border border-[#8F2449]/40 space-y-6">
@@ -351,6 +364,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                 href={CONFIG.paymentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={openPayPalCheckout}
                 className="animate-paypal-pulse relative flex flex-col items-center justify-center w-full py-4 sm:py-5 px-6 sm:px-8 rounded-2xl bg-gradient-to-r from-[#FFC439] via-[#FFB700] to-[#E5A800] hover:from-[#FFD05E] hover:to-[#FFB700] text-[#002C6C] font-black text-lg sm:text-xl shadow-2xl active:scale-[0.98] transition-all cursor-pointer border-2 border-[#FFE885] no-underline"
               >
                 <div className="flex items-center justify-center gap-2.5 sm:gap-3">

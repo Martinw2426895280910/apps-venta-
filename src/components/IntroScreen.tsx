@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, Sparkles, CheckCircle2, ShieldCheck, KeyRound, MessageCircle, Clock, Award } from 'lucide-react';
 import { CONFIG } from '../data';
+import { openPayPalCheckout } from '../utils/payment';
 import heroImg from '../assets/images/hero_conquista_50_1789796336873.jpg';
 import coupleImg from '../assets/images/couple_romance_50_1789796350674.jpg';
 import gentlemanImg from '../assets/images/mature_gentleman_style_1789796364777.jpg';
@@ -45,6 +46,22 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              {/* PRIMARY PROMINENT PAYPAL BUTTON IN HERO */}
+              <a
+                id="hero-paypal-direct-btn"
+                href={CONFIG.paymentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={openPayPalCheckout}
+                className="animate-paypal-pulse inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-[#FFC439] via-[#FFB700] to-[#E5A800] hover:brightness-105 active:scale-[0.98] text-[#002C6C] font-black text-base md:text-lg shadow-xl shadow-amber-900/30 transition-all border-2 border-[#FFE885] cursor-pointer"
+              >
+                <svg className="w-5 h-5 md:w-6 md:h-6 shrink-0" viewBox="0 0 24 24" fill="none">
+                  <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
+                  <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
+                </svg>
+                <span className="uppercase">Comprar Guía con PayPal ({CONFIG.price})</span>
+              </a>
+
               {unlocked && onGoGuide ? (
                 <button
                   id="hero-go-guide-btn"
@@ -59,10 +76,10 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
                 <button
                   id="hero-start-test-btn"
                   onClick={onStartQuiz}
-                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-[#ECC978] via-[#D9B25A] to-[#B8892F] hover:brightness-105 active:scale-[0.98] text-[#2A1A1F] font-bold text-base md:text-lg shadow-lg shadow-black/25 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2.5 px-6 py-4 rounded-full bg-white/15 hover:bg-white/25 active:scale-[0.98] text-white border border-white/40 font-bold text-base shadow-md backdrop-blur-xs transition-all cursor-pointer"
                 >
                   <span>Hacer Test Gratis (2 min)</span>
-                  <ArrowRight className="w-5 h-5 text-[#2A1A1F]" />
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </button>
               )}
 
@@ -70,10 +87,10 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
                 <button
                   id="hero-enter-code-btn"
                   onClick={onOpenUnlock}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] text-white border border-white/30 text-sm md:text-base font-semibold backdrop-blur-xs transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-black/30 hover:bg-black/40 active:scale-[0.98] text-[#F4EBE0] border border-white/20 text-xs sm:text-sm font-semibold backdrop-blur-xs transition-all cursor-pointer"
                 >
                   <KeyRound className="w-4 h-4 text-[#ECC978]" />
-                  <span>Ya compré: Ingresar código</span>
+                  <span>Tengo código</span>
                 </button>
               )}
 
@@ -317,21 +334,20 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
             <ArrowRight className="w-4 h-4" />
           </button>
 
-          {!unlocked && (
-            <a
-              id="intro-bottom-paypal-btn"
-              href={CONFIG.paymentUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="animate-paypal-pulse inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-full bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277]"
-            >
-              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
-                <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
-                <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
-              </svg>
-              <span>Comprar Guía con PayPal ({CONFIG.price})</span>
-            </a>
-          )}
+          <a
+            id="intro-bottom-paypal-btn"
+            href={CONFIG.paymentUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={openPayPalCheckout}
+            className="animate-paypal-pulse inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-4 rounded-full bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-sm shadow-md transition-all border border-[#FFE277] cursor-pointer"
+          >
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
+              <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
+              <path d="M18.847 8.636c-.982 2.337-2.738 3.655-5.222 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.847 4.629a.641.641 0 0 1-.633.528H6.96l-.235 1.282a.641.641 0 0 0 .633.74h4.606a.784.784 0 0 0 .773-.654l.872-4.764c.094-.627.593-1.128 1.22-1.194l.21-.022c2.484-.261 4.24-1.579 5.222-3.916.982-2.337.949-4.198-.098-5.534a4.98 4.98 0 0 0-.316-.369z" fill="#0079C1" />
+            </svg>
+            <span>Comprar Guía con PayPal ({CONFIG.price})</span>
+          </a>
         </div>
       </section>
     </div>

@@ -6,6 +6,7 @@ import { ResultScreen } from './components/ResultScreen';
 import { GuideScreen } from './components/GuideScreen';
 import { UnlockModal } from './components/UnlockModal';
 import { Toast } from './components/Toast';
+import { FloatingPaypalBar } from './components/FloatingPaypalBar';
 import { QUESTIONS, CONFIG } from './data';
 import { DiagnosisScore, CategoryKey } from './types';
 
@@ -310,6 +311,9 @@ export default function App() {
 
       {/* Global Toast Alert */}
       <Toast message={toastMessage} />
+
+      {/* Floating Sticky PayPal Purchase Bar */}
+      <FloatingPaypalBar unlocked={unlocked} />
     </div>
   );
 }
