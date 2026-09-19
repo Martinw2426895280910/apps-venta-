@@ -31,12 +31,20 @@ export interface DateIdea {
   d: string;
   imageUrl: string;
   tag: string;
+  detalleCaballero?: string; // Toque maestro / consejo exclusivo de caballero
+  quePedir?: string; // Sugerencia de pedido o bebida
 }
 
 export interface MessageGroup {
   g: string;
   tone: string;
+  porQueFunciona: string; // Explicación psicológica del tono
   items: string[];
+  analisis?: {
+    msg: string;
+    explicacion: string;
+    momento: string;
+  }[];
 }
 
 export interface PlanDay {
@@ -44,6 +52,20 @@ export interface PlanDay {
   cat: CategoryKey | null;
   a: string;
   x: string;
+  ejemploReal?: string; // Ejemplo práctico de la vida real
+  guionSugerido?: string; // Qué decir o pensar con exactitud
+}
+
+export interface PracticalCase {
+  id: string;
+  title: string;
+  icon: string;
+  situation: string;
+  errorComun: string;
+  formaCaballero: string;
+  dialogoExacto: string;
+  porQueFunciona: string;
+  reglaDeOro: string;
 }
 
 export interface AppConfig {

@@ -365,9 +365,10 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={openPayPalCheckout}
-                className="animate-paypal-pulse relative flex flex-col items-center justify-center w-full py-4 sm:py-5 px-6 sm:px-8 rounded-2xl bg-gradient-to-r from-[#FFC439] via-[#FFB700] to-[#E5A800] hover:from-[#FFD05E] hover:to-[#FFB700] text-[#002C6C] font-black text-lg sm:text-xl shadow-2xl active:scale-[0.98] transition-all cursor-pointer border-2 border-[#FFE885] no-underline"
+                className="animate-paypal-destello relative overflow-hidden flex flex-col items-center justify-center w-full py-4 sm:py-5 px-6 sm:px-8 rounded-2xl bg-gradient-to-r from-[#FFC439] via-[#FFB700] to-[#E5A800] hover:from-[#FFD05E] hover:to-[#FFB700] text-[#002C6C] font-black text-lg sm:text-xl shadow-2xl active:scale-[0.98] transition-all cursor-pointer border-2 border-[#FFE885] no-underline"
               >
-                <div className="flex items-center justify-center gap-2.5 sm:gap-3">
+                <div className="paypal-shimmer-sweep" />
+                <div className="flex items-center justify-center gap-2.5 sm:gap-3 relative z-10">
                   {/* Official PayPal Monogram SVG */}
                   <svg className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" viewBox="0 0 24 24" fill="none">
                     <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
@@ -376,7 +377,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                   <span className="tracking-tight uppercase">PAGAR CON PAYPAL ({CONFIG.price})</span>
                   <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 text-[#002C6C] shrink-0" />
                 </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-[#003087]/85 tracking-normal mt-1">
+                <span className="text-[11px] sm:text-xs font-semibold text-[#003087]/85 tracking-normal mt-1 relative z-10">
                   Tarjeta de Crédito, Débito o Saldo PayPal • Desbloqueo Inmediato
                 </span>
               </a>
@@ -384,12 +385,12 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 
             <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-center space-y-1">
               <p className="text-[11px] sm:text-xs text-[#ECC978]">
-                ⚡ <strong>Entrega automática:</strong> Tras completar tu pago seguro en PayPal recibirás tu código de acceso para ingresarlo aquí abajo y desbloquear tu guía al instante.
+                ⚡ <strong>Acceso verificado:</strong> Tras completar tu pago seguro en PayPal, ingresa tu código de acceso privado para desbloquear tu guía inmediatamente. Si necesitas tu código, solicítalo por WhatsApp con tu comprobante.
               </p>
             </div>
 
             {/* Alternative payment method via WhatsApp */}
-            <div className="flex items-center justify-center pt-1">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
               <a
                 id="result-buy-whatsapp-btn"
                 href={whatsappUrl}
@@ -398,7 +399,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                 className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-[#25D366] hover:text-[#42f085] text-xs sm:text-sm font-semibold border border-[#25D366]/40 transition-colors"
               >
                 <MessageCircle className="w-4 h-4 fill-current" />
-                <span>¿Prefieres transferir o acordar por WhatsApp? Haz clic aquí</span>
+                <span>¿Prefieres transferir o consultar por WhatsApp?</span>
               </a>
             </div>
           </div>
@@ -417,7 +418,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                   setCode(e.target.value);
                   if (codeError) setCodeError('');
                 }}
-                placeholder="Ingresa tu código (Ej: CONQUISTA50)"
+                placeholder="Escribe tu código de acceso aquí..."
                 autoCapitalize="characters"
                 autoComplete="off"
                 className="flex-1 px-4 py-3 bg-white/10 border border-[#ECC978]/50 rounded-xl text-white placeholder:text-white/50 text-sm font-semibold tracking-wider uppercase focus:outline-none focus:border-[#ECC978]"

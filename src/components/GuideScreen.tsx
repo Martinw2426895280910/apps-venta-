@@ -14,7 +14,8 @@ import {
   ShieldAlert, 
   CheckCircle2,
   ExternalLink,
-  Home
+  Home,
+  BookOpen
 } from 'lucide-react';
 import { 
   CATS, 
@@ -25,6 +26,8 @@ import {
   DAY7, 
   IDEAS, 
   MSG_GROUPS, 
+  CASOS_PRACTICOS,
+  CLAVES_PSICOLOGIA_50,
   ERR_FLAGS, 
   ERR_GENERAL, 
   AVOID_PHRASES, 
@@ -48,7 +51,7 @@ interface GuideScreenProps {
   onShowToast: (message: string) => void;
 }
 
-type TabType = 'diag' | 'plan' | 'citas' | 'msg' | 'err' | 'rel';
+type TabType = 'diag' | 'plan' | 'citas' | 'msg' | 'casos' | 'err' | 'rel';
 
 export const GuideScreen: React.FC<GuideScreenProps> = ({
   scoreData,
@@ -111,6 +114,12 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
     PLAN.forEach((p, idx) => {
       const action = p.cat ? p.a : (DAY7[objective] || DAY7.claro);
       lines.push(`Día ${idx + 1} [${p.t}]: ${action}`);
+      if (p.ejemploReal) {
+        lines.push(`   * Ejemplo práctico: ${p.ejemploReal}`);
+      }
+      if (p.guionSugerido) {
+        lines.push(`   * Guion sugerido: "${p.guionSugerido}"`);
+      }
       if (p.cat && (pct[p.cat] ?? 0) < 67) {
         lines.push(`   * Consejo prioritario: ${p.x}`);
       }
@@ -118,16 +127,29 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
     lines.push('\n== 3. 10 IDEAS DE CITAS SELECCIONADAS ==');
     displayIdeas.forEach((idea, idx) => {
       lines.push(`${idx + 1}. ${idea.t} (Costo: ${'$'.repeat(idea.c)}) - ${idea.d}`);
+      if (idea.detalleCaballero) lines.push(`   * Toque de caballero: ${idea.detalleCaballero}`);
+      if (idea.quePedir) lines.push(`   * Qué pedir: ${idea.quePedir}`);
     });
-    lines.push('\n== 4. MENSAJES PARA WHATSAPP ==');
+    lines.push('\n== 4. MENSAJES PARA WHATSAPP CON ANÁLISIS ==');
     MSG_GROUPS.forEach((g) => {
       lines.push(`\n[${g.g}] (${g.tone})`);
+      if (g.porQueFunciona) lines.push(`* Por qué funciona: ${g.porQueFunciona}`);
       g.items.forEach((msg) => lines.push(`• "${msg}"`));
     });
-    lines.push('\n== 5. ERRORES CRÍTICOS A EVITAR ==');
+    lines.push('\n== 5. CASOS REALES Y SITUACIONES TÍPICAS ==');
+    CASOS_PRACTICOS.forEach((c) => {
+      lines.push(`\n[${c.title}]`);
+      lines.push(`Situación: ${c.situation}`);
+      lines.push(`Error común: ${c.errorComun}`);
+      lines.push(`Actuación de caballero: ${c.formaCaballero}`);
+      lines.push(`Diálogo exacto: ${c.dialogoExacto}`);
+      lines.push(`Por qué funciona: ${c.porQueFunciona}`);
+      lines.push(`Regla de oro: ${c.reglaDeOro}`);
+    });
+    lines.push('\n== 6. ERRORES CRÍTICOS A EVITAR ==');
     ERR_GENERAL.forEach((err) => lines.push(`• ${err.t}: ${err.d}`));
     lines.push(`Frases prohibidas: ${AVOID_PHRASES.join(' | ')}`);
-    lines.push('\n== 6. PILARES PARA UNA RELACIÓN SÓLIDA ==');
+    lines.push('\n== 7. PILARES PARA UNA RELACIÓN SÓLIDA ==');
     PILARES.forEach((pil) => lines.push(`• ${pil.t}: ${pil.d}`));
     lines.push('\nRecuerda: Conquistar es comenzar. Enamorar a una mujer madura es cuidar los detalles cada día con respeto y coherencia.');
 
@@ -139,6 +161,7 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
     { id: 'plan', label: 'Plan 7 Días', icon: <Calendar className="w-4 h-4" /> },
     { id: 'citas', label: '10 Citas con Fotos', icon: <Heart className="w-4 h-4" /> },
     { id: 'msg', label: '15 Mensajes', icon: <MessageSquare className="w-4 h-4" /> },
+    { id: 'casos', label: 'Casos Reales & Guiones', icon: <BookOpen className="w-4 h-4" /> },
     { id: 'err', label: 'Errores & Frases', icon: <ShieldAlert className="w-4 h-4" /> },
     { id: 'rel', label: 'Relación 90 Días', icon: <Sparkles className="w-4 h-4" /> },
   ];
@@ -387,6 +410,35 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
                         {actionText}
                       </p>
 
+                      {day.ejemploReal && (
+                        <div className="mt-2.5 p-3.5 bg-[#FAF0E1]/90 border border-[#D9B25A]/70 rounded-xl space-y-1">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#6D1A36]">
+                            <BookOpen className="w-3.5 h-3.5 text-[#B8892F]" />
+                            <span>Ejemplo Explicativo Real:</span>
+                          </div>
+                          <p className="text-xs sm:text-sm text-[#4A2D37] leading-relaxed italic">
+                            "{day.ejemploReal}"
+                          </p>
+                        </div>
+                      )}
+
+                      {day.guionSugerido && (
+                        <div className="mt-2 p-3 bg-white border border-[#E2D3BA] rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-2xs">
+                          <div className="text-xs text-[#543F47] leading-relaxed">
+                            <strong className="text-[#3D0F20] font-semibold block sm:inline mr-1">💬 Guion sugerido:</strong>
+                            <span className="font-medium text-[#2A1A1F]">"{day.guionSugerido}"</span>
+                          </div>
+                          <button
+                            id={`copy-guion-${idx}`}
+                            onClick={() => handleCopyText(day.guionSugerido!, 'Guion sugerido')}
+                            className="self-end sm:self-center shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FAF7F2] hover:bg-[#FAF0E1] text-[11px] font-semibold text-[#6D1A36] border border-[#D9B25A] transition-colors cursor-pointer"
+                          >
+                            <Copy className="w-3 h-3 text-[#B8892F]" />
+                            <span>Copiar</span>
+                          </button>
+                        </div>
+                      )}
+
                       {isWeakCategory && (
                         <div className="mt-2 p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed">
                           <strong className="block text-amber-950 font-semibold mb-0.5">
@@ -476,6 +528,20 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
                       <p className="text-xs text-[#543F47] leading-relaxed">
                         {idea.d}
                       </p>
+
+                      {idea.detalleCaballero && (
+                        <div className="mt-2.5 p-2.5 bg-[#FAF0E1] border border-[#E2D3BA] rounded-xl text-xs text-[#3D0F20] leading-relaxed">
+                          <strong className="text-[#6D1A36] font-semibold block mb-0.5">🎩 Toque de caballero:</strong>
+                          <span>{idea.detalleCaballero}</span>
+                        </div>
+                      )}
+
+                      {idea.quePedir && (
+                        <div className="mt-1.5 p-2 bg-white/90 border border-[#E8DEC9] rounded-xl text-xs text-[#543F47]">
+                          <strong className="text-[#B8892F] font-semibold mr-1">🍷 Sugerencia:</strong>
+                          <span>{idea.quePedir}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="pt-2 border-t border-[#E8DEC9] flex items-center justify-between text-[11px] text-[#7A626B]">
@@ -512,24 +578,31 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {MSG_GROUPS.map((group, gIdx) => (
-                <div key={gIdx} className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-[#F0E5D0] pb-2">
+                <div key={gIdx} className="space-y-3.5 bg-[#FAF7F2] p-5 sm:p-6 rounded-2xl border border-[#E2D3BA]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#F0E5D0] pb-2.5">
                     <h3 className="font-display font-bold text-lg text-[#3D0F20]">
                       {group.g}
                     </h3>
-                    <span className="text-xs text-[#7A626B] font-medium italic">
+                    <span className="text-xs text-[#7A626B] font-semibold italic">
                       Tono: {group.tone}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-1 gap-3">
+                  {group.porQueFunciona && (
+                    <div className="p-3 rounded-xl bg-[#FAF0E1] border border-[#D9B25A]/60 text-xs text-[#4A2D37] leading-relaxed">
+                      <strong className="text-[#6D1A36] font-bold block mb-0.5">🧠 Psicología detrás de este tono:</strong>
+                      <span>{group.porQueFunciona}</span>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 gap-3 pt-1">
                     {group.items.map((msgText, mIdx) => (
                       <div
                         key={mIdx}
                         id={`msg-card-${gIdx}-${mIdx}`}
-                        className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E2D3BA] hover:border-[#D9B25A] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        className="p-4 rounded-xl bg-white border border-[#E2D3BA] hover:border-[#D9B25A] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs"
                       >
                         <p className="text-xs sm:text-sm text-[#2A1A1F] leading-relaxed font-normal select-all">
                           "{msgText}"
@@ -537,7 +610,7 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
                         <button
                           id={`copy-msg-btn-${gIdx}-${mIdx}`}
                           onClick={() => handleCopyText(msgText, 'Mensaje')}
-                          className="self-end sm:self-center shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#FAF0E1] active:scale-95 text-[#6D1A36] border border-[#D9B25A] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                          className="self-end sm:self-center shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FAF7F2] hover:bg-[#FAF0E1] active:scale-95 text-[#6D1A36] border border-[#D9B25A] text-xs font-semibold shadow-2xs transition-all cursor-pointer"
                         >
                           <Copy className="w-3.5 h-3.5 text-[#B8892F]" />
                           <span>Copiar</span>
@@ -545,8 +618,152 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
                       </div>
                     ))}
                   </div>
+
+                  {group.analisis && group.analisis.length > 0 && (
+                    <div className="pt-2.5 border-t border-[#E8DEC9] space-y-2">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#6D1A36] block">
+                        🔍 Cuándo usar cada mensaje y por qué funciona:
+                      </span>
+                      <div className="grid grid-cols-1 gap-2">
+                        {group.analisis.map((item, aIdx) => (
+                          <div key={aIdx} className="text-xs bg-white/90 p-2.5 rounded-lg border border-[#E8DEC9] text-[#4A2D37] space-y-0.5">
+                            <div>
+                              <strong className="text-[#6D1A36]">"{item.msg}"</strong>
+                              <span className="text-[#7A626B] text-[11px] ml-1.5 font-medium">({item.momento})</span>
+                            </div>
+                            <p className="text-[#543F47] text-[11px] leading-relaxed">
+                              {item.explicacion}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* TAB CONTENT: Casos Reales y Guiones Prácticos */}
+      {activeTab === 'casos' && (
+        <section className="space-y-6 animate-in fade-in duration-200">
+          <div className="bg-white border border-[#E2D3BA] rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF0E1] border border-[#D9B25A] text-xs font-bold text-[#6D1A36] mb-2">
+                <BookOpen className="w-3.5 h-3.5 text-[#B8892F]" />
+                <span>Situaciones Reales con Diálogos Textuales</span>
+              </div>
+              <h2 className="font-display font-bold text-2xl sm:text-3xl text-[#2A1A1F]">
+                Casos Prácticos y Guiones de Conversación
+              </h2>
+              <p className="text-xs sm:text-sm text-[#7A626B] mt-1">
+                Aprende qué decir exactamente en los momentos más delicados: silencios, la cuenta, cancelaciones y el tema de los ex.
+              </p>
+            </div>
+
+            {/* Practical Cases Cards */}
+            <div className="space-y-6">
+              {CASOS_PRACTICOS.map((caso, cIdx) => (
+                <article
+                  key={cIdx}
+                  id={`caso-practico-${cIdx}`}
+                  className="bg-[#FAF7F2] border border-[#E2D3BA] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4 hover:border-[#D9B25A] transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl sm:text-3xl p-2 bg-white rounded-xl border border-[#E8DEC9] shadow-2xs shrink-0">
+                      {caso.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-display font-bold text-lg text-[#2A1A1F]">
+                        {caso.title}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-[#543F47] mt-0.5 leading-relaxed">
+                        <strong className="text-[#3D0F20]">Situación:</strong> {caso.situation}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div className="p-3.5 bg-rose-50/80 border border-rose-200 rounded-xl text-xs text-rose-950 space-y-1">
+                      <strong className="flex items-center gap-1 font-bold text-rose-800">
+                        <span>❌ Lo que hace el 90% (Error):</span>
+                      </strong>
+                      <p className="leading-relaxed">{caso.errorComun}</p>
+                    </div>
+
+                    <div className="p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs text-emerald-950 space-y-1">
+                      <strong className="flex items-center gap-1 font-bold text-emerald-800">
+                        <span>🎩 El enfoque del caballero 50+:</span>
+                      </strong>
+                      <p className="leading-relaxed">{caso.formaCaballero}</p>
+                    </div>
+                  </div>
+
+                  {/* Diálogo exacto con botón copiar */}
+                  <div className="p-4 bg-white rounded-xl border-2 border-[#D9B25A]/80 shadow-2xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#6D1A36] uppercase tracking-wider flex items-center gap-1">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#B8892F]" />
+                        <span>Diálogo exacto que debes decir:</span>
+                      </span>
+                      <button
+                        id={`copy-dialogo-${cIdx}`}
+                        onClick={() => handleCopyText(caso.dialogoExacto, 'Diálogo exacto')}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FAF7F2] hover:bg-[#FAF0E1] text-[11px] font-semibold text-[#6D1A36] border border-[#D9B25A] transition-colors cursor-pointer"
+                      >
+                        <Copy className="w-3 h-3 text-[#B8892F]" />
+                        <span>Copiar frase</span>
+                      </button>
+                    </div>
+                    <blockquote className="text-xs sm:text-sm text-[#2A1A1F] font-serif italic pl-3 border-l-2 border-[#6D1A36] leading-relaxed select-all">
+                      "{caso.dialogoExacto}"
+                    </blockquote>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1 text-xs text-[#543F47] leading-relaxed">
+                    <p>
+                      <strong className="text-[#3D0F20]">🧠 Por qué funciona en ella:</strong> {caso.porQueFunciona}
+                    </p>
+                    <p className="p-2.5 bg-[#FAF0E1]/70 rounded-lg border border-[#E2D3BA] text-[#4A2D37]">
+                      <strong className="text-[#B8892F]">⭐ Regla de oro:</strong> {caso.reglaDeOro}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            {/* Claves psicológicas de la mujer de 50 */}
+            <div className="pt-6 border-t border-[#F0E5D0] space-y-4">
+              <h3 className="font-display font-bold text-xl text-[#2A1A1F]">
+                4 Claves Psicológicas para Comprender a una Mujer de 50
+              </h3>
+              <p className="text-xs sm:text-sm text-[#7A626B]">
+                Comprender su momento vital es lo que te diferencia instantáneamente de los hombres inmaduros o necesitados:
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {CLAVES_PSICOLOGIA_50.map((clave, kIdx) => (
+                  <div
+                    key={kIdx}
+                    className="p-4.5 rounded-2xl bg-[#FAF7F2] border border-[#E2D3BA] space-y-2 hover:border-[#D9B25A] transition-colors"
+                  >
+                    <h4 className="font-bold text-sm text-[#6D1A36] flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#FAF0E1] text-[#6D1A36] border border-[#D9B25A] inline-flex items-center justify-center text-xs">
+                        {kIdx + 1}
+                      </span>
+                      <span>{clave.titulo}</span>
+                    </h4>
+                    <p className="text-xs text-[#543F47] leading-relaxed">
+                      {clave.concepto}
+                    </p>
+                    <div className="p-2 bg-white rounded-lg border border-[#E8DEC9] text-[11px] text-[#3D0F20]">
+                      <strong className="text-[#B8892F]">Acción para ti:</strong> {clave.accionClave}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

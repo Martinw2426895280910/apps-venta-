@@ -24,23 +24,66 @@ export default function App() {
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Restore state from localStorage on mount
+  // Restore state from localStorage on mount & check for automatic payment verification in URL
   useEffect(() => {
+    let currentAnswers = Array(QUESTIONS.length).fill(null);
+    let currentUnlocked = false;
+    let currentPlan: Record<number, boolean> = {};
+    let currentRel: Record<number, boolean> = {};
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed.answers) && parsed.answers.length === QUESTIONS.length) {
+          currentAnswers = parsed.answers;
           setAnswers(parsed.answers);
         }
         if (typeof parsed.unlocked === 'boolean') {
+          currentUnlocked = parsed.unlocked;
           setUnlocked(parsed.unlocked);
         }
-        if (parsed.planChecks) setPlanChecks(parsed.planChecks);
-        if (parsed.relChecks) setRelChecks(parsed.relChecks);
+        if (parsed.planChecks) {
+          currentPlan = parsed.planChecks;
+          setPlanChecks(parsed.planChecks);
+        }
+        if (parsed.relChecks) {
+          currentRel = parsed.relChecks;
+          setRelChecks(parsed.relChecks);
+        }
       }
     } catch {
       // Ignore parse errors
+    }
+
+    // Check for automatic verification via URL parameter (e.g. PayPal return URL: ?paid=true, ?status=completed, ?code=...)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = params.get('code');
+      const paidParam = params.get('paid')?.toLowerCase();
+      const statusParam = (params.get('status') || params.get('payment_status') || params.get('st') || '').toLowerCase();
+      const paymentParam = (params.get('payment') || '').toLowerCase();
+
+      const isPaid = 
+        paidParam === 'true' || 
+        paidParam === '1' || 
+        statusParam === 'completed' || 
+        statusParam === 'success' ||
+        paymentParam === 'success' || 
+        paymentParam === 'completed';
+
+      const isCodeValid = urlCode && CONFIG.codes.some((c) => c.toUpperCase() === urlCode.trim().toUpperCase());
+
+      if (isCodeValid || isPaid) {
+        setUnlocked(true);
+        saveState(currentAnswers, true, currentPlan, currentRel);
+        setToastMessage('¡Pago verificado con éxito! Tu guía completa ha sido desbloqueada.');
+        setScreen('guide');
+        // Clean URL cleanly to avoid repeating triggers or sharing URL with query parameters
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } catch {
+      // Ignore URL parsing errors
     }
   }, []);
 
