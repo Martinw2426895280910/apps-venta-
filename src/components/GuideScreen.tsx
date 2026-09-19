@@ -13,7 +13,8 @@ import {
   Compass, 
   ShieldAlert, 
   CheckCircle2,
-  ExternalLink
+  ExternalLink,
+  Home
 } from 'lucide-react';
 import { 
   CATS, 
@@ -42,6 +43,7 @@ interface GuideScreenProps {
   relChecks: Record<number, boolean>;
   onToggleRelCheck: (index: number) => void;
   onBackToResult: () => void;
+  onGoHome?: () => void;
   onShowToast: (message: string) => void;
 }
 
@@ -56,6 +58,7 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
   relChecks,
   onToggleRelCheck,
   onBackToResult,
+  onGoHome,
   onShowToast,
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('diag');
@@ -162,14 +165,28 @@ export const GuideScreen: React.FC<GuideScreenProps> = ({
             </p>
           </div>
 
-          <button
-            id="guide-back-to-result-btn"
-            onClick={onBackToResult}
-            className="self-start sm:self-center inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs sm:text-sm text-[#ECC978] border border-white/20 transition-colors no-print cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Ver mi resultado</span>
-          </button>
+          <div className="flex items-center gap-2 self-start sm:self-center flex-wrap no-print">
+            {onGoHome && (
+              <button
+                id="guide-back-to-home-btn"
+                onClick={onGoHome}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-xs sm:text-sm text-[#F4EBE0] border border-white/20 transition-colors cursor-pointer"
+                title="Volver a la página principal"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>Inicio</span>
+              </button>
+            )}
+
+            <button
+              id="guide-back-to-result-btn"
+              onClick={onBackToResult}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#ECC978]/20 hover:bg-[#ECC978]/30 text-xs sm:text-sm text-[#ECC978] border border-[#ECC978]/40 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Ver mi resultado</span>
+            </button>
+          </div>
         </div>
       </header>
 

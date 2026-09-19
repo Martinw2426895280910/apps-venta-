@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, Check, Sparkles } from 'lucide-react';
+import { ChevronLeft, Check, Sparkles, Home } from 'lucide-react';
 import { QUESTIONS, CATS, CAT_ICON } from '../data';
 import { CategoryKey } from '../types';
 
@@ -8,13 +8,15 @@ interface QuizScreenProps {
   answers: (number | null)[];
   onSelectOption: (optionIndex: number) => void;
   onBack: () => void;
+  onGoHome?: () => void;
 }
 
 export const QuizScreen: React.FC<QuizScreenProps> = ({
   currentIndex,
   answers,
   onSelectOption,
-  onBack
+  onBack,
+  onGoHome
 }) => {
   const currentQ = QUESTIONS[currentIndex];
   const total = QUESTIONS.length;
@@ -36,14 +38,28 @@ export const QuizScreen: React.FC<QuizScreenProps> = ({
       {/* Top Navigation & Progress */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <button
-            id="quiz-back-btn"
-            onClick={onBack}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-[#6D1A36] hover:text-[#3D0F20] px-2.5 py-1.5 rounded-lg hover:bg-[#F2EAE0] transition-colors cursor-pointer"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            <span>Atrás</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              id="quiz-back-btn"
+              onClick={onBack}
+              className="inline-flex items-center gap-1 text-sm font-semibold text-[#6D1A36] hover:text-[#3D0F20] px-2.5 py-1.5 rounded-lg hover:bg-[#F2EAE0] transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Atrás</span>
+            </button>
+
+            {onGoHome && (
+              <button
+                id="quiz-home-btn"
+                onClick={onGoHome}
+                className="inline-flex items-center gap-1 text-xs sm:text-sm font-medium text-[#7A626B] hover:text-[#3D0F20] px-2.5 py-1.5 rounded-lg hover:bg-[#F2EAE0] transition-colors cursor-pointer"
+                title="Volver a la página principal"
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>Inicio</span>
+              </button>
+            )}
+          </div>
           
           <span className="text-xs font-bold text-[#7A626B] uppercase tracking-wider bg-[#FAF0E1] px-3 py-1 rounded-full border border-[#E2D3BA]">
             Pregunta {currentIndex + 1} de {total}

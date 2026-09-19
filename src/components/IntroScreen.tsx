@@ -10,6 +10,8 @@ interface IntroScreenProps {
   onOpenUnlock: () => void;
   hasPreviousResult: boolean;
   onViewResult: () => void;
+  unlocked?: boolean;
+  onGoGuide?: () => void;
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({
@@ -17,6 +19,8 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
   onOpenUnlock,
   hasPreviousResult,
   onViewResult,
+  unlocked,
+  onGoGuide,
 }) => {
   return (
     <div className="space-y-8 animate-in fade-in duration-300 pb-16">
@@ -41,23 +45,47 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                id="hero-start-test-btn"
-                onClick={onStartQuiz}
-                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-[#ECC978] via-[#D9B25A] to-[#B8892F] hover:brightness-105 active:scale-[0.98] text-[#2A1A1F] font-bold text-base md:text-lg shadow-lg shadow-black/25 transition-all cursor-pointer"
-              >
-                <span>Hacer Test Gratis (2 min)</span>
-                <ArrowRight className="w-5 h-5 text-[#2A1A1F]" />
-              </button>
+              {unlocked && onGoGuide ? (
+                <button
+                  id="hero-go-guide-btn"
+                  onClick={onGoGuide}
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-[#ECC978] via-[#D9B25A] to-[#B8892F] hover:brightness-105 active:scale-[0.98] text-[#2A1A1F] font-bold text-base md:text-lg shadow-lg shadow-black/25 transition-all cursor-pointer"
+                >
+                  <Sparkles className="w-5 h-5 text-[#2A1A1F]" />
+                  <span>Ver mi Guía Desbloqueada</span>
+                  <ArrowRight className="w-5 h-5 text-[#2A1A1F]" />
+                </button>
+              ) : (
+                <button
+                  id="hero-start-test-btn"
+                  onClick={onStartQuiz}
+                  className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-[#ECC978] via-[#D9B25A] to-[#B8892F] hover:brightness-105 active:scale-[0.98] text-[#2A1A1F] font-bold text-base md:text-lg shadow-lg shadow-black/25 transition-all cursor-pointer"
+                >
+                  <span>Hacer Test Gratis (2 min)</span>
+                  <ArrowRight className="w-5 h-5 text-[#2A1A1F]" />
+                </button>
+              )}
 
-              <button
-                id="hero-enter-code-btn"
-                onClick={onOpenUnlock}
-                className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] text-white border border-white/30 text-sm md:text-base font-semibold backdrop-blur-xs transition-all cursor-pointer"
-              >
-                <KeyRound className="w-4 h-4 text-[#ECC978]" />
-                <span>Ya compré: Ingresar código</span>
-              </button>
+              {!unlocked && (
+                <button
+                  id="hero-enter-code-btn"
+                  onClick={onOpenUnlock}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] text-white border border-white/30 text-sm md:text-base font-semibold backdrop-blur-xs transition-all cursor-pointer"
+                >
+                  <KeyRound className="w-4 h-4 text-[#ECC978]" />
+                  <span>Ya compré: Ingresar código</span>
+                </button>
+              )}
+
+              {unlocked && (
+                <button
+                  id="hero-start-test-retake-btn"
+                  onClick={onStartQuiz}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] text-white border border-white/30 text-sm md:text-base font-semibold backdrop-blur-xs transition-all cursor-pointer"
+                >
+                  <span>Repetir Test Diagnóstico</span>
+                </button>
+              )}
             </div>
 
             {hasPreviousResult && (

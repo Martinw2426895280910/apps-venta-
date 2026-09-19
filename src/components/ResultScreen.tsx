@@ -10,7 +10,8 @@ import {
   ArrowRight, 
   AlertCircle, 
   Lightbulb,
-  HeartHandshake
+  HeartHandshake,
+  Home
 } from 'lucide-react';
 import { CONFIG, CATS, CAT_ICON, TIP } from '../data';
 import { DiagnosisScore, CategoryKey } from '../types';
@@ -21,6 +22,7 @@ interface ResultScreenProps {
   onUnlock: (code: string) => boolean;
   onOpenGuide: () => void;
   onRetake: () => void;
+  onGoHome?: () => void;
 }
 
 export const ResultScreen: React.FC<ResultScreenProps> = ({
@@ -28,7 +30,8 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   unlocked,
   onUnlock,
   onOpenGuide,
-  onRetake
+  onRetake,
+  onGoHome
 }) => {
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
@@ -115,6 +118,20 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-300 pb-16">
       
+      {/* Top Navigation Back to Home */}
+      {onGoHome && (
+        <div className="flex items-center justify-between no-print">
+          <button
+            id="result-back-home-btn"
+            onClick={onGoHome}
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#6D1A36] hover:text-[#3D0F20] px-3 py-1.5 rounded-full hover:bg-[#F2EAE0] transition-colors cursor-pointer"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span>Volver a la página principal</span>
+          </button>
+        </div>
+      )}
+
       {/* Score Header Card */}
       <section className="bg-[#FFFDF9] border border-[#E2D3BA] rounded-3xl p-6 sm:p-8 text-center shadow-md relative overflow-hidden">
         <div className="text-xs font-bold text-[#7A626B] uppercase tracking-widest mb-3">

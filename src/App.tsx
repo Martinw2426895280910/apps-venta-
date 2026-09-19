@@ -37,13 +37,6 @@ export default function App() {
         }
         if (parsed.planChecks) setPlanChecks(parsed.planChecks);
         if (parsed.relChecks) setRelChecks(parsed.relChecks);
-
-        // If they already unlocked previously, take them to guide or result if they visit
-        if (parsed.unlocked) {
-          setScreen('guide');
-        } else if (parsed.answers && parsed.answers.every((a: any) => a !== null)) {
-          setScreen('result');
-        }
       }
     } catch {
       // Ignore parse errors
@@ -228,13 +221,26 @@ export default function App() {
     saveState(answers, unlocked, planChecks, updated);
   };
 
+  const handleGoHome = () => {
+    setScreen('intro');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleGoGuide = () => {
+    setScreen('guide');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#24171D] flex flex-col font-sans selection:bg-[#6D1A36] selection:text-white">
       {/* Top App Header */}
       <Header
         unlocked={unlocked}
         onOpenUnlock={() => setIsUnlockModalOpen(true)}
-        onResetTest={screen === 'quiz' ? () => setScreen('intro') : undefined}
+        onResetTest={screen === 'quiz' ? handleGoHome : undefined}
+        onGoHome={handleGoHome}
+        onGoGuide={unlocked ? handleGoGuide : undefined}
+        currentScreen={screen}
         score={isQuizComplete ? scoreData.score : null}
       />
 
@@ -249,6 +255,8 @@ export default function App() {
               setScreen(unlocked ? 'guide' : 'result');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            unlocked={unlocked}
+            onGoGuide={handleGoGuide}
           />
         )}
 
@@ -258,6 +266,7 @@ export default function App() {
             answers={answers}
             onSelectOption={handleSelectOption}
             onBack={handleBackQuiz}
+            onGoHome={handleGoHome}
           />
         )}
 
@@ -266,11 +275,9 @@ export default function App() {
             scoreData={scoreData}
             unlocked={unlocked}
             onUnlock={handleUnlockCode}
-            onOpenGuide={() => {
-              setScreen('guide');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+            onOpenGuide={handleGoGuide}
             onRetake={handleRetakeQuiz}
+            onGoHome={handleGoHome}
           />
         )}
 
@@ -287,6 +294,7 @@ export default function App() {
               setScreen('result');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            onGoHome={handleGoHome}
             onShowToast={showToast}
           />
         )}
