@@ -72,5 +72,5 @@ export interface AppConfig {
   price: string;
   paymentUrl: string;
   whatsapp: string;
-  codes: string[];
+  codes?: string[];
 }

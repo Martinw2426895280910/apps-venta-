@@ -13,7 +13,8 @@ import {
   HeartHandshake,
   Home,
   ShieldCheck,
-  CreditCard
+  CreditCard,
+  Loader2
 } from 'lucide-react';
 import { CONFIG, CATS, CAT_ICON, TIP } from '../data';
 import { DiagnosisScore, CategoryKey } from '../types';
@@ -22,7 +23,7 @@ import { openPayPalCheckout } from '../utils/payment';
 interface ResultScreenProps {
   scoreData: DiagnosisScore;
   unlocked: boolean;
-  onUnlock: (code: string) => boolean;
+  onUnlock: (code: string) => Promise<{ success: boolean; error?: string }> | boolean;
   onOpenGuide: () => void;
   onRetake: () => void;
   onGoHome?: () => void;
@@ -38,6 +39,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 }) => {
   const [code, setCode] = useState('');
   const [codeError, setCodeError] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
   const [displayScore, setDisplayScore] = useState(0);
 
   const { score, cats, pct } = scoreData;
@@ -96,17 +98,30 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   // Take top 3 recommendations (categories with lowest score, or sorted)
   const topTips = cats.slice(0, 3);
 
-  const handleUnlockSubmit = (e: React.FormEvent) => {
+  const handleUnlockSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim()) {
-      setCodeError('Escribe el código que recibiste por WhatsApp.');
+    const clean = code.trim();
+    if (!clean) {
+      setCodeError('Escribe tu ID de orden de PayPal o código personal.');
       return;
     }
-    const success = onUnlock(code.trim());
-    if (success) {
-      setCodeError('');
-    } else {
-      setCodeError('Código incorrecto. Verifica el mensaje recibido tras abonar.');
+    setIsVerifying(true);
+    setCodeError('');
+    try {
+      const res = await onUnlock(clean);
+      if (typeof res === 'boolean') {
+        if (!res) {
+          setCodeError('Clave no válida. No se admiten claves compartidas.');
+        }
+      } else if (res.success) {
+        setCodeError('');
+      } else {
+        setCodeError(res.error || 'Código incorrecto. No se admiten claves compartidas; cada comprador debe pagar su propio acceso individual.');
+      }
+    } catch (err: any) {
+      setCodeError(err?.message || 'Error validando con el servidor.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -406,8 +421,8 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 
           {/* Access Code Input Box */}
           <div className="pt-4 border-t border-white/15 space-y-3">
-            <label htmlFor="resultCodeInput" className="block text-xs font-bold text-[#ECC978] uppercase tracking-wider">
-              ¿Ya compraste y tienes tu código? Escríbelo aquí:
+            <label htmlFor="resultCodeInput" className="block text-xs font-bold text-[#ECC978] tracking-wider">
+              ¿Ya pagaste con PayPal? Valida con tu ID de orden o código personal:
             </label>
             <form onSubmit={handleUnlockSubmit} className="flex flex-col sm:flex-row gap-2">
               <input
@@ -418,23 +433,33 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
                   setCode(e.target.value);
                   if (codeError) setCodeError('');
                 }}
-                placeholder="Escribe tu código de acceso aquí..."
-                autoCapitalize="characters"
+                disabled={isVerifying}
+                placeholder="ID de transacción de PayPal o código personal..."
                 autoComplete="off"
-                className="flex-1 px-4 py-3 bg-white/10 border border-[#ECC978]/50 rounded-xl text-white placeholder:text-white/50 text-sm font-semibold tracking-wider uppercase focus:outline-none focus:border-[#ECC978]"
+                className="flex-1 px-4 py-3 bg-white/10 border border-[#ECC978]/50 rounded-xl text-white placeholder:text-white/50 text-sm font-semibold tracking-wider focus:outline-none focus:border-[#ECC978] disabled:opacity-60"
               />
               <button
                 type="submit"
                 id="result-unlock-code-btn"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#ECC978] to-[#B8892F] hover:brightness-105 active:scale-98 text-[#2A1A1F] font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                disabled={isVerifying}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#ECC978] to-[#B8892F] hover:brightness-105 active:scale-98 text-[#2A1A1F] font-bold text-sm shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 disabled:opacity-60"
               >
-                <KeyRound className="w-4 h-4" />
-                <span>Desbloquear</span>
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Validando...</span>
+                  </>
+                ) : (
+                  <>
+                    <KeyRound className="w-4 h-4" />
+                    <span>Validar y Entrar</span>
+                  </>
+                )}
               </button>
             </form>
             {codeError && (
-              <div className="flex items-center gap-1.5 text-xs text-rose-300 font-medium">
-                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <div className="flex items-start gap-1.5 text-xs text-rose-300 font-medium p-2 bg-rose-950/40 border border-rose-500/30 rounded-lg">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                 <span>{codeError}</span>
               </div>
             )}

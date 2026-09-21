@@ -1,10 +1,9 @@
 import { CategoryKey, Question, DateIdea, MessageGroup, PlanDay, PracticalCase, AppConfig } from './types';
 
 export const CONFIG: AppConfig = {
-  price: "$7 USD",
+  price: "$5 USD",
   paymentUrl: "https://www.paypal.com/ncp/payment/PLB-CYD69X6FXCUJ",
-  whatsapp: "543772636749",
-  codes: ["CONQUISTA50", "VIP50", "AMOR50"]
+  whatsapp: "543772636749"
 };
 
 export const CATS: Record<CategoryKey, string> = {

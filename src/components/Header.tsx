@@ -1,7 +1,8 @@
 import React from 'react';
-import { KeyRound, MessageCircle, RotateCcw, HeartHandshake, Home, BookOpen } from 'lucide-react';
+import { KeyRound, MessageCircle, RotateCcw, HeartHandshake, Home, BookOpen, User, Server } from 'lucide-react';
 import { CONFIG } from '../data';
 import { openPayPalCheckout } from '../utils/payment';
+import { UserProfile } from '../utils/auth';
 
 interface HeaderProps {
   unlocked: boolean;
@@ -9,7 +10,11 @@ interface HeaderProps {
   onResetTest?: () => void;
   onGoHome: () => void;
   onGoGuide?: () => void;
-  currentScreen: 'intro' | 'quiz' | 'result' | 'guide';
+  onOpenAuth?: () => void;
+  onOpenDeploymentGuide?: () => void;
+  currentUser?: UserProfile | null;
+  onLogout?: () => void;
+  currentScreen: 'intro' | 'quiz' | 'result' | 'guide' | 'return';
   score?: number | null;
 }
 
@@ -19,6 +24,10 @@ export const Header: React.FC<HeaderProps> = ({
   onResetTest,
   onGoHome,
   onGoGuide,
+  onOpenAuth,
+  onOpenDeploymentGuide,
+  currentUser,
+  onLogout,
   currentScreen,
   score
 }) => {
@@ -29,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   )}`;
 
   return (
-    <header className="sticky top-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E2D3BA] px-4 py-3 no-print">
+    <header className="sticky top-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-md border-b border-[#E2D3BA] px-3 sm:px-4 py-2.5 sm:py-3 no-print">
       <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
         <button
           onClick={onGoHome}
@@ -83,6 +92,25 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
+          {/* User Account / Login Button */}
+          {onOpenAuth && (
+            <button
+              id="header-auth-btn"
+              onClick={onOpenAuth}
+              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all border cursor-pointer ${
+                currentUser
+                  ? 'bg-[#FAF0E1] text-[#6D1A36] border-[#D9B25A]'
+                  : 'bg-white hover:bg-[#FAF7F2] text-[#2A1A1F] border-[#E8DEC9]'
+              }`}
+              title={currentUser ? `Cuenta: ${currentUser.email}` : 'Iniciar sesión con cuenta'}
+            >
+              <User className="w-3.5 h-3.5 text-[#6D1A36]" />
+              <span className="hidden sm:inline truncate max-w-[100px]">
+                {currentUser ? currentUser.email.split('@')[0] : 'Mi Cuenta'}
+              </span>
+            </button>
+          )}
+
           {/* Always Visible, Prominent PayPal Button */}
           <a
             id="header-paypal-btn"
@@ -91,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
             rel="noopener noreferrer"
             onClick={openPayPalCheckout}
             className="animate-paypal-pulse inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#FFC439] to-[#FFB700] hover:brightness-105 text-[#002C6C] font-black text-xs md:text-sm border-2 border-[#FFE885] shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
-            title="Comprar Guía con PayPal ($7 USD)"
+            title="Comprar Guía con PayPal ($5 USD)"
           >
             <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.784.784 0 0 1 .773-.654h6.58c3.082 0 5.438.742 6.452 2.036 1.047 1.336 1.08 3.197.098 5.534-.98 2.337-2.736 3.655-5.22 3.916l-.21.022c-.628.066-1.127.567-1.22 1.194l-.79 4.316a.641.641 0 0 1-.632.528l-3.69-.275z" fill="#003087" />
@@ -113,8 +141,20 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <span className="hidden md:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Desbloqueada
+              Vitalicio Activo
             </span>
+          )}
+
+          {/* Deployment / Webhook Guide */}
+          {onOpenDeploymentGuide && (
+            <button
+              onClick={onOpenDeploymentGuide}
+              className="p-1.5 rounded-full hover:bg-[#EFE6D7] text-[#7A626B] transition-colors cursor-pointer"
+              title="Guía de Despliegue en Vercel & Webhook PayPal"
+              aria-label="Guía de Despliegue"
+            >
+              <Server className="w-4 h-4" />
+            </button>
           )}
 
           <a
@@ -145,3 +185,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

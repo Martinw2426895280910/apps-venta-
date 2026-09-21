@@ -5,14 +5,18 @@ import { QuizScreen } from './components/QuizScreen';
 import { ResultScreen } from './components/ResultScreen';
 import { GuideScreen } from './components/GuideScreen';
 import { UnlockModal } from './components/UnlockModal';
+import { AuthModal } from './components/AuthModal';
+import { ReturnScreen } from './components/ReturnScreen';
+import { DeploymentGuideModal } from './components/DeploymentGuideModal';
 import { Toast } from './components/Toast';
 import { FloatingPaypalBar } from './components/FloatingPaypalBar';
 import { QUESTIONS, CONFIG } from './data';
 import { DiagnosisScore, CategoryKey } from './types';
+import { getStoredUser, checkServerAccess, clearSession, UserProfile, redeemPersonalCode } from './utils/auth';
 
 const STORAGE_KEY = 'guia_conquista_50_v2';
 
-type ScreenType = 'intro' | 'quiz' | 'result' | 'guide';
+type ScreenType = 'intro' | 'quiz' | 'result' | 'guide' | 'return';
 
 export default function App() {
   const [screen, setScreen] = useState<ScreenType>('intro');
@@ -22,6 +26,10 @@ export default function App() {
   const [planChecks, setPlanChecks] = useState<Record<number, boolean>>({});
   const [relChecks, setRelChecks] = useState<Record<number, boolean>>({});
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState<boolean>(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'claim'>('login');
+  const [isDeploymentGuideOpen, setIsDeploymentGuideOpen] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Restore state from localStorage on mount & check for automatic payment verification in URL
@@ -56,31 +64,47 @@ export default function App() {
       // Ignore parse errors
     }
 
-    // Check for automatic verification via URL parameter (e.g. PayPal return URL: ?paid=true, ?status=completed, ?code=...)
+    // Check stored user account & revalidate access with server database
+    const storedUser = getStoredUser();
+    if (storedUser) {
+      setCurrentUser(storedUser);
+      checkServerAccess(storedUser.email).then((status) => {
+        if (status.hasAccess) {
+          setUnlocked(true);
+          saveState(currentAnswers, true, currentPlan, currentRel);
+        }
+      }).catch(() => {
+        // Fallback to local storage if offline
+      });
+    }
+
+    // Check for Return URL parameters from PayPal (e.g. ?return=true, ?order_id=..., ?token=..., etc.)
     try {
       const params = new URLSearchParams(window.location.search);
+      const isReturn = 
+        params.get('return') === 'true' || 
+        Boolean(params.get('order_id')) || 
+        Boolean(params.get('token')) || 
+        Boolean(params.get('tx')) ||
+        params.get('paid') === 'true';
+
       const urlCode = params.get('code');
-      const paidParam = params.get('paid')?.toLowerCase();
-      const statusParam = (params.get('status') || params.get('payment_status') || params.get('st') || '').toLowerCase();
-      const paymentParam = (params.get('payment') || '').toLowerCase();
-
-      const isPaid = 
-        paidParam === 'true' || 
-        paidParam === '1' || 
-        statusParam === 'completed' || 
-        statusParam === 'success' ||
-        paymentParam === 'success' || 
-        paymentParam === 'completed';
-
-      const isCodeValid = urlCode && CONFIG.codes.some((c) => c.toUpperCase() === urlCode.trim().toUpperCase());
-
-      if (isCodeValid || isPaid) {
-        setUnlocked(true);
-        saveState(currentAnswers, true, currentPlan, currentRel);
-        setToastMessage('¡Pago verificado con éxito! Tu guía completa ha sido desbloqueada.');
-        setScreen('guide');
-        // Clean URL cleanly to avoid repeating triggers or sharing URL with query parameters
-        window.history.replaceState({}, document.title, window.location.pathname);
+      if (urlCode) {
+        redeemPersonalCode(urlCode, storedUser?.email).then((res) => {
+          if (res.success) {
+            setUnlocked(true);
+            saveState(currentAnswers, true, currentPlan, currentRel);
+            setToastMessage('¡Acceso personal validado con éxito!');
+            setScreen('guide');
+          } else {
+            setToastMessage(res.error || 'Código inválido o ya utilizado por otra persona.');
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+      } else if (isReturn) {
+        // Requirement 3 & 5: Do not simply trust ?paid=true.
+        // Route to ReturnScreen to verify cryptographically and server-side with PayPal.
+        setScreen('return');
       }
     } catch {
       // Ignore URL parsing errors
@@ -229,19 +253,34 @@ export default function App() {
     }
   };
 
-  const handleUnlockCode = (enteredCode: string): boolean => {
-    const clean = enteredCode.trim().toUpperCase();
-    const isValid = CONFIG.codes.some((c) => c.toUpperCase() === clean);
-
-    if (isValid) {
+  const handleUnlockCode = async (enteredCode: string): Promise<{ success: boolean; error?: string }> => {
+    const res = await redeemPersonalCode(enteredCode, currentUser?.email);
+    if (res.success) {
       setUnlocked(true);
       saveState(answers, true, planChecks, relChecks);
-      showToast('¡Guía desbloqueada con éxito!');
+      showToast('¡Acceso personal validado con éxito! Guía completa desbloqueada.');
       setScreen('guide');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      return true;
+      return { success: true };
     }
-    return false;
+    return {
+      success: false,
+      error: res.error || 'Código incorrecto. No se admiten claves compartidas: cada persona debe realizar su compra en PayPal.'
+    };
+  };
+
+  const handleLoginSuccess = (user: UserProfile, hasAccess: boolean) => {
+    setCurrentUser(user);
+    if (hasAccess) {
+      setUnlocked(true);
+      saveState(answers, true, planChecks, relChecks);
+    }
+  };
+
+  const handleLogout = () => {
+    clearSession();
+    setCurrentUser(null);
+    showToast('Sesión cerrada.');
   };
 
   const handleRetakeQuiz = () => {
@@ -271,6 +310,10 @@ export default function App() {
   };
 
   const handleGoGuide = () => {
+    if (!unlocked) {
+      setIsUnlockModalOpen(true);
+      return;
+    }
     setScreen('guide');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -284,6 +327,13 @@ export default function App() {
         onResetTest={screen === 'quiz' ? handleGoHome : undefined}
         onGoHome={handleGoHome}
         onGoGuide={unlocked ? handleGoGuide : undefined}
+        onOpenAuth={() => {
+          setAuthModalTab('login');
+          setIsAuthModalOpen(true);
+        }}
+        onOpenDeploymentGuide={() => setIsDeploymentGuideOpen(true)}
+        currentUser={currentUser}
+        onLogout={handleLogout}
         currentScreen={screen}
         score={isQuizComplete ? scoreData.score : null}
       />
@@ -342,6 +392,22 @@ export default function App() {
             onShowToast={showToast}
           />
         )}
+
+        {screen === 'return' && (
+          <ReturnScreen
+            currentUser={currentUser}
+            onSuccess={(user) => {
+              if (user) setCurrentUser(user);
+              setUnlocked(true);
+              saveState(answers, true, planChecks, relChecks);
+              setScreen('guide');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.history.replaceState({}, document.title, window.location.pathname);
+            }}
+            onCancel={handleGoHome}
+            onShowToast={showToast}
+          />
+        )}
       </main>
 
       {/* Access Code Unlock Modal */}
@@ -349,7 +415,28 @@ export default function App() {
         isOpen={isUnlockModalOpen}
         onClose={() => setIsUnlockModalOpen(false)}
         onUnlock={handleUnlockCode}
+        onOpenAuth={(tab) => {
+          setAuthModalTab(tab || 'login');
+          setIsAuthModalOpen(true);
+        }}
         score={isQuizComplete ? scoreData.score : null}
+      />
+
+      {/* Auth / Login / Claim Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser}
+        onLoginSuccess={handleLoginSuccess}
+        onShowToast={showToast}
+        defaultTab={authModalTab}
+      />
+
+      {/* Deployment & Webhook Setup Guide Modal */}
+      <DeploymentGuideModal
+        isOpen={isDeploymentGuideOpen}
+        onClose={() => setIsDeploymentGuideOpen(false)}
+        onShowToast={showToast}
       />
 
       {/* Global Toast Alert */}
